@@ -78,7 +78,22 @@ public class Board
         int validItemCount = totalCells - (totalCells % 3);
 
         List<NormalItem.eNormalType> itemTypesToSpawn = new List<NormalItem.eNormalType>();
-        for (int i = 0; i < validItemCount / 3; i++)
+        
+        // Ensure all types are present (1 triplet for each type)
+        Array allTypes = Enum.GetValues(typeof(NormalItem.eNormalType));
+        foreach (NormalItem.eNormalType type in allTypes)
+        {
+            if (itemTypesToSpawn.Count + 3 <= validItemCount)
+            {
+                itemTypesToSpawn.Add(type);
+                itemTypesToSpawn.Add(type);
+                itemTypesToSpawn.Add(type);
+            }
+        }
+
+        // Fill the rest randomly
+        int remainingTriplets = (validItemCount - itemTypesToSpawn.Count) / 3;
+        for (int i = 0; i < remainingTriplets; i++)
         {
             NormalItem.eNormalType randomType = Utils.GetRandomNormalType();
             itemTypesToSpawn.Add(randomType);

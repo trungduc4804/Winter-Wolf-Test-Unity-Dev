@@ -84,10 +84,56 @@ public class GameManager : MonoBehaviour
 
     public bool IsWin { get; private set; }
 
+    public bool IsTimeChallengeMode { get; private set; }
+
+    private void OnTimeOrMovesOut()
+    {
+        GameOver(false);
+    }
+
     public void LoadLevel(eLevelMode mode)
     {
+        IsTimeChallengeMode = false;
         m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
         m_boardController.StartGame(this, m_gameSettings);
+
+        if (m_levelCondition != null)
+        {
+            m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
+            Destroy(m_levelCondition.gameObject);
+        }
+
+        if (mode == eLevelMode.MOVES)
+        {
+            m_levelCondition = this.gameObject.AddComponent<LevelMoves>();
+            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionView(), m_boardController);
+        }
+        else if (mode == eLevelMode.TIMER)
+        {
+            m_levelCondition = this.gameObject.AddComponent<LevelTime>();
+            m_levelCondition.Setup(m_gameSettings.LevelTime, m_uiMenu.GetLevelConditionView(), this);
+        }
+
+        m_levelCondition.ConditionCompleteEvent += OnTimeOrMovesOut;
+
+        State = eStateGame.GAME_STARTED;
+    }
+
+    public void LoadLevelTimeChallenge()
+    {
+        IsTimeChallengeMode = true;
+        m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
+        m_boardController.StartGame(this, m_gameSettings);
+
+        if (m_levelCondition != null)
+        {
+            m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
+            Destroy(m_levelCondition.gameObject);
+        }
+
+        m_levelCondition = this.gameObject.AddComponent<LevelTime>();
+        m_levelCondition.Setup(60f, m_uiMenu.GetLevelConditionView(), this);
+        m_levelCondition.ConditionCompleteEvent += OnTimeOrMovesOut;
 
         State = eStateGame.GAME_STARTED;
     }
@@ -106,6 +152,13 @@ public class GameManager : MonoBehaviour
 
     internal void ClearLevel()
     {
+        if (m_levelCondition != null)
+        {
+            m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
+            Destroy(m_levelCondition.gameObject);
+            m_levelCondition = null;
+        }
+
         if (m_boardController)
         {
             m_boardController.Clear();
@@ -122,6 +175,13 @@ public class GameManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(1f);
+
+        if (m_levelCondition != null)
+        {
+            m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
+            Destroy(m_levelCondition.gameObject);
+            m_levelCondition = null;
+        }
 
         if (IsWin)
         {

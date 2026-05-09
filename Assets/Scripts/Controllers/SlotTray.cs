@@ -91,7 +91,7 @@ public class SlotTray : MonoBehaviour
     {
         for (int i = 0; i < m_items.Count; i++)
         {
-            m_items[i].View.DOMove(m_slotPositions[i], 0.3f);
+            m_items[i].View.DOJump(m_slotPositions[i], 1f, 1, 0.3f);
         }
     }
 
@@ -103,5 +103,26 @@ public class SlotTray : MonoBehaviour
             if (item is NormalItem ni && ni.ItemType == type) count++;
         }
         return count;
+    }
+
+    public void RemoveItem(Item item)
+    {
+        if (m_items.Contains(item))
+        {
+            m_items.Remove(item);
+            UpdateItemPositions();
+        }
+    }
+
+    public Item GetItemAtPosition(Vector2 pos)
+    {
+        foreach (var item in m_items)
+        {
+            if (item.View != null && Vector2.Distance(item.View.position, pos) < 0.6f)
+            {
+                return item;
+            }
+        }
+        return null;
     }
 }

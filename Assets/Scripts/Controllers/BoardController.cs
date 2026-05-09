@@ -21,6 +21,7 @@ public class BoardController : MonoBehaviour
 
     private bool m_gameOver;
 
+
     public SlotTray m_slotTray;
 
     public void StartGame(GameManager gameManager, GameSettings gameSettings)
@@ -68,6 +69,7 @@ public class BoardController : MonoBehaviour
         if (m_gameOver) return;
         if (IsBusy) return;
 
+
         if (m_board.IsEmpty())
         {
             m_gameManager.GameOver(true);
@@ -77,14 +79,18 @@ public class BoardController : MonoBehaviour
 
         if (m_slotTray.IsFull)
         {
-            m_gameManager.GameOver(false);
-            m_gameOver = true;
-            return;
+            if (m_gameManager == null || !m_gameManager.IsTimeChallengeMode)
+            {
+                m_gameManager.GameOver(false);
+                m_gameOver = true;
+                return;
+            }
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            var hit = Physics2D.Raycast(m_cam.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            Vector2 clickPos = m_cam.ScreenToWorldPoint(Input.mousePosition);
+            var hit = Physics2D.Raycast(clickPos, Vector2.zero);
             if (hit.collider != null)
             {
                 Cell cell = hit.collider.GetComponent<Cell>();
@@ -93,11 +99,24 @@ public class BoardController : MonoBehaviour
                     if (!m_slotTray.IsFull)
                     {
                         Item item = cell.Item;
+                        item.OriginalCell = cell; // Save origin
                         cell.Free(); // Remove from board
                         item.SetSortingLayerHigher();
                         m_slotTray.AddItem(item);
                         OnMoveEvent();
                     }
+                }
+            }
+            else if (m_gameManager != null && m_gameManager.IsTimeChallengeMode)
+            {
+                // Check if clicking on tray item to return it
+                Item clickedTrayItem = m_slotTray.GetItemAtPosition(clickPos);
+                if (clickedTrayItem != null && clickedTrayItem.OriginalCell != null && clickedTrayItem.OriginalCell.IsEmpty)
+                {
+                    m_slotTray.RemoveItem(clickedTrayItem);
+                    clickedTrayItem.SetSortingLayerLower();
+                    clickedTrayItem.OriginalCell.Assign(clickedTrayItem);
+                    clickedTrayItem.AnimationMoveToPosition(); // Moves back to cell
                 }
             }
         }
@@ -143,6 +162,7 @@ public class BoardController : MonoBehaviour
         if (cell != null && !cell.IsEmpty && !m_slotTray.IsFull)
         {
             Item item = cell.Item;
+            item.OriginalCell = cell; // Save origin
             cell.Free();
             item.SetSortingLayerHigher();
             m_slotTray.AddItem(item);

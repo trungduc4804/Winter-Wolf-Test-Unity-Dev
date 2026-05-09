@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +8,8 @@ using DG.Tweening;
 public class Item
 {
     public Cell Cell { get; private set; }
+    
+    public Cell OriginalCell { get; set; }
 
     public Transform View { get; private set; }
 
@@ -98,7 +100,7 @@ public class Item
     {
         if (View)
         {
-            View.DOScale(0.1f, 0.1f).OnComplete(
+            View.DOScale(0f, 0.2f).SetEase(Ease.InBack).OnComplete(
                 () =>
                 {
                     GameObject.Destroy(View.gameObject);

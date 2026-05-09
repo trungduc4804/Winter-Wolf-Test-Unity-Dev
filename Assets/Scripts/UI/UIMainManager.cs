@@ -131,4 +131,9 @@ public class UIMainManager : MonoBehaviour
     {
         m_gameManager.LoadLevelAuto(isWin);
     }
+
+    internal void LoadLevelTimeChallenge()
+    {
+        m_gameManager.LoadLevelTimeChallenge();
+    }
 }
