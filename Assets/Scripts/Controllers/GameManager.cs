@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
         GAME_STARTED,
         PAUSE,
         GAME_OVER,
+        GAME_WIN
     }
 
     private eStateGame m_state;
@@ -81,29 +82,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool IsWin { get; private set; }
+
     public void LoadLevel(eLevelMode mode)
     {
         m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
         m_boardController.StartGame(this, m_gameSettings);
 
-        if (mode == eLevelMode.MOVES)
-        {
-            m_levelCondition = this.gameObject.AddComponent<LevelMoves>();
-            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionView(), m_boardController);
-        }
-        else if (mode == eLevelMode.TIMER)
-        {
-            m_levelCondition = this.gameObject.AddComponent<LevelTime>();
-            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionView(), this);
-        }
-
-        m_levelCondition.ConditionCompleteEvent += GameOver;
-
         State = eStateGame.GAME_STARTED;
     }
 
-    public void GameOver()
+    public void LoadLevelAuto(bool isWin)
     {
+        LoadLevel(eLevelMode.TIMER);
+        m_boardController.StartAutoPlay(isWin);
+    }
+
+    public void GameOver(bool isWin)
+    {
+        IsWin = isWin;
         StartCoroutine(WaitBoardController());
     }
 
@@ -119,21 +116,20 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitBoardController()
     {
-        while (m_boardController.IsBusy)
+        while (m_boardController != null && m_boardController.IsBusy)
         {
             yield return new WaitForEndOfFrame();
         }
 
         yield return new WaitForSeconds(1f);
 
-        State = eStateGame.GAME_OVER;
-
-        if (m_levelCondition != null)
+        if (IsWin)
         {
-            m_levelCondition.ConditionCompleteEvent -= GameOver;
-
-            Destroy(m_levelCondition);
-            m_levelCondition = null;
+            State = eStateGame.GAME_WIN;
+        }
+        else
+        {
+            State = eStateGame.GAME_OVER;
         }
     }
 }

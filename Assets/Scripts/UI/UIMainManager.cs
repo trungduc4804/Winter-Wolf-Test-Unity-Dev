@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +14,11 @@ public class UIMainManager : MonoBehaviour
     private void Awake()
     {
         m_menuList = GetComponentsInChildren<IMenu>(true);
+        Canvas canvas = GetComponent<Canvas>();
+        if (canvas != null)
+        {
+            canvas.sortingOrder = 30000;
+        }
     }
 
     void Start()
@@ -69,6 +74,9 @@ public class UIMainManager : MonoBehaviour
             case GameManager.eStateGame.GAME_OVER:
                 ShowMenu<UIPanelGameOver>();
                 break;
+            case GameManager.eStateGame.GAME_WIN:
+                ShowMenu<UIPanelWin>();
+                break;
         }
     }
 
@@ -117,5 +125,10 @@ public class UIMainManager : MonoBehaviour
     internal void ShowGameMenu()
     {
         m_gameManager.SetState(GameManager.eStateGame.GAME_STARTED);
+    }
+
+    internal void LoadLevelAuto(bool isWin)
+    {
+        m_gameManager.LoadLevelAuto(isWin);
     }
 }

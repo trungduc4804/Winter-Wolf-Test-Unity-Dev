@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,11 +15,11 @@ public class Board
         ALL
     }
 
-    private int boardSizeX;
+    public int boardSizeX;
 
-    private int boardSizeY;
+    public int boardSizeY;
 
-    private Cell[,] m_cells;
+    public Cell[,] m_cells;
 
     private Transform m_root;
 
@@ -74,38 +74,44 @@ public class Board
 
     internal void Fill()
     {
+        int totalCells = boardSizeX * boardSizeY;
+        int validItemCount = totalCells - (totalCells % 3);
+
+        List<NormalItem.eNormalType> itemTypesToSpawn = new List<NormalItem.eNormalType>();
+        for (int i = 0; i < validItemCount / 3; i++)
+        {
+            NormalItem.eNormalType randomType = Utils.GetRandomNormalType();
+            itemTypesToSpawn.Add(randomType);
+            itemTypesToSpawn.Add(randomType);
+            itemTypesToSpawn.Add(randomType);
+        }
+
+        // Shuffle the list
+        for (int i = 0; i < itemTypesToSpawn.Count; i++)
+        {
+            int rnd = UnityEngine.Random.Range(0, itemTypesToSpawn.Count);
+            NormalItem.eNormalType temp = itemTypesToSpawn[i];
+            itemTypesToSpawn[i] = itemTypesToSpawn[rnd];
+            itemTypesToSpawn[rnd] = temp;
+        }
+
+        int itemIndex = 0;
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
             {
                 Cell cell = m_cells[x, y];
-                NormalItem item = new NormalItem();
-
-                List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
-                if (cell.NeighbourBottom != null)
+                if (itemIndex < itemTypesToSpawn.Count)
                 {
-                    NormalItem nitem = cell.NeighbourBottom.Item as NormalItem;
-                    if (nitem != null)
-                    {
-                        types.Add(nitem.ItemType);
-                    }
+                    NormalItem item = new NormalItem();
+                    item.SetType(itemTypesToSpawn[itemIndex]);
+                    item.SetView();
+                    item.SetViewRoot(m_root);
+
+                    cell.Assign(item);
+                    cell.ApplyItemPosition(false);
+                    itemIndex++;
                 }
-
-                if (cell.NeighbourLeft != null)
-                {
-                    NormalItem nitem = cell.NeighbourLeft.Item as NormalItem;
-                    if (nitem != null)
-                    {
-                        types.Add(nitem.ItemType);
-                    }
-                }
-
-                item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
-                item.SetView();
-                item.SetViewRoot(m_root);
-
-                cell.Assign(item);
-                cell.ApplyItemPosition(false);
             }
         }
     }
@@ -343,6 +349,18 @@ public class Board
         }
 
         return list;
+    }
+
+    public bool IsEmpty()
+    {
+        for (int x = 0; x < boardSizeX; x++)
+        {
+            for (int y = 0; y < boardSizeY; y++)
+            {
+                if (!m_cells[x, y].IsEmpty) return false;
+            }
+        }
+        return true;
     }
 
     public List<Cell> CheckBonusIfCompatible(List<Cell> matches)

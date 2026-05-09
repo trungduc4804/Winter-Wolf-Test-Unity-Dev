@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIPanelGameOver : MonoBehaviour, IMenu
+public class UIPanelWin : MonoBehaviour, IMenu
 {
     [SerializeField] private Button btnClose;
 
@@ -11,7 +11,7 @@ public class UIPanelGameOver : MonoBehaviour, IMenu
 
     private void Awake()
     {
-        btnClose.onClick.AddListener(OnClickClose);
+        if (btnClose) btnClose.onClick.AddListener(OnClickClose);
     }
 
     private void OnDestroy()
