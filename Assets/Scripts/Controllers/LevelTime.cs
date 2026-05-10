@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,8 +38,8 @@ public class LevelTime : LevelCondition
 
     protected override void UpdateText()
     {
+        if (m_txt == null) return;
         if (m_time < 0f) return;
-
         m_txt.text = string.Format("TIME:\n{0:00}", m_time);
     }
 }

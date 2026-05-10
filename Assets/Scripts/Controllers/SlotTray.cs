@@ -9,6 +9,8 @@ public class SlotTray : MonoBehaviour
     
     private Vector3[] m_slotPositions;
 
+    public float TrayAreaMinY { get; private set; }
+
     public bool IsFull => m_items.Count >= MaxSlots;
 
     public void Setup(Transform root, int maxSlots = 5)
@@ -20,9 +22,12 @@ public class SlotTray : MonoBehaviour
         float screenBottomY = cam.ScreenToWorldPoint(new Vector3(0, 0, 0)).y;
         
         float startX = -(MaxSlots / 2f) + 0.5f;
+        float trayY = screenBottomY + 1f;
+        TrayAreaMinY = trayY - 0.8f;
+
         for (int i = 0; i < MaxSlots; i++)
         {
-            m_slotPositions[i] = new Vector3(startX + i, screenBottomY + 1f, 0);
+            m_slotPositions[i] = new Vector3(startX + i, trayY, 0);
             
             GameObject prefabBG = Resources.Load<GameObject>(Constants.PREFAB_CELL_BACKGROUND);
             if (prefabBG != null)
@@ -91,7 +96,11 @@ public class SlotTray : MonoBehaviour
     {
         for (int i = 0; i < m_items.Count; i++)
         {
-            m_items[i].View.DOJump(m_slotPositions[i], 1f, 1, 0.3f);
+            if (m_items[i].View != null)
+            {
+                m_items[i].View.DOKill();
+                m_items[i].View.DOMove(m_slotPositions[i], 0.2f);
+            }
         }
     }
 

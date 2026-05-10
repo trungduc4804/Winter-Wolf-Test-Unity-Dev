@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +39,7 @@ public class LevelMoves : LevelCondition
 
     protected override void UpdateText()
     {
+        if (m_txt == null) return;
         m_txt.text = string.Format("MOVES:\n{0}", m_moves);
     }
 

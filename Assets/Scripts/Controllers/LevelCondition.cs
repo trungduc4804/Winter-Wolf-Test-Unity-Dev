@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,11 +20,13 @@ public class LevelCondition : MonoBehaviour
     public virtual void Setup(float value, Text txt, GameManager mngr)
     {
         m_txt = txt;
+        if (m_txt != null) m_txt.gameObject.SetActive(true);
     }
 
     public virtual void Setup(float value, Text txt, BoardController board)
     {
         m_txt = txt;
+        if (m_txt != null) m_txt.gameObject.SetActive(true);
     }
 
     protected virtual void UpdateText() { }
@@ -38,6 +40,10 @@ public class LevelCondition : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-
+        if (m_txt != null)
+        {
+            m_txt.text = "";
+            m_txt.gameObject.SetActive(false);
+        }
     }
 }

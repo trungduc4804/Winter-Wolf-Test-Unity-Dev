@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,5 +35,10 @@ public class UIPanelGame : MonoBehaviour,IMenu
     public void Hide()
     {
         this.gameObject.SetActive(false);
+        if (LevelConditionView != null)
+        {
+            LevelConditionView.gameObject.SetActive(false);
+            LevelConditionView.text = "";
+        }
     }
 }

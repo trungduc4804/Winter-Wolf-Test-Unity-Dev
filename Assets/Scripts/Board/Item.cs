@@ -39,6 +39,7 @@ public class Item
     {
         if (View == null) return;
 
+        View.DOKill();
         View.DOMove(Cell.transform.position, 0.2f);
     }
 

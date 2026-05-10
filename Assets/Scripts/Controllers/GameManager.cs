@@ -100,18 +100,18 @@ public class GameManager : MonoBehaviour
         if (m_levelCondition != null)
         {
             m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
-            Destroy(m_levelCondition.gameObject);
+            Destroy(m_levelCondition);
         }
 
         if (mode == eLevelMode.MOVES)
         {
             m_levelCondition = this.gameObject.AddComponent<LevelMoves>();
-            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionView(), m_boardController);
+            m_levelCondition.Setup(m_gameSettings.LevelMoves, null, m_boardController);
         }
         else if (mode == eLevelMode.TIMER)
         {
             m_levelCondition = this.gameObject.AddComponent<LevelTime>();
-            m_levelCondition.Setup(m_gameSettings.LevelTime, m_uiMenu.GetLevelConditionView(), this);
+            m_levelCondition.Setup(m_gameSettings.LevelTime, null, this);
         }
 
         m_levelCondition.ConditionCompleteEvent += OnTimeOrMovesOut;
@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
         if (m_levelCondition != null)
         {
             m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
-            Destroy(m_levelCondition.gameObject);
+            Destroy(m_levelCondition);
         }
 
         m_levelCondition = this.gameObject.AddComponent<LevelTime>();
@@ -155,7 +155,7 @@ public class GameManager : MonoBehaviour
         if (m_levelCondition != null)
         {
             m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
-            Destroy(m_levelCondition.gameObject);
+            Destroy(m_levelCondition);
             m_levelCondition = null;
         }
 
@@ -179,7 +179,7 @@ public class GameManager : MonoBehaviour
         if (m_levelCondition != null)
         {
             m_levelCondition.ConditionCompleteEvent -= OnTimeOrMovesOut;
-            Destroy(m_levelCondition.gameObject);
+            Destroy(m_levelCondition);
             m_levelCondition = null;
         }
 

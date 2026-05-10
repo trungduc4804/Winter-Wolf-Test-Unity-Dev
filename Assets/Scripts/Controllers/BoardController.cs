@@ -90,12 +90,15 @@ public class BoardController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 clickPos = m_cam.ScreenToWorldPoint(Input.mousePosition);
+            bool clickedCell = false;
+            
             var hit = Physics2D.Raycast(clickPos, Vector2.zero);
             if (hit.collider != null)
             {
                 Cell cell = hit.collider.GetComponent<Cell>();
                 if (cell != null && !cell.IsEmpty)
                 {
+                    clickedCell = true;
                     if (!m_slotTray.IsFull)
                     {
                         Item item = cell.Item;
@@ -107,16 +110,18 @@ public class BoardController : MonoBehaviour
                     }
                 }
             }
-            else if (m_gameManager != null && m_gameManager.IsTimeChallengeMode)
+            
+            if (m_gameManager != null && m_gameManager.IsTimeChallengeMode
+                && clickPos.y <= m_slotTray.TrayAreaMinY + 1.6f)
             {
-                // Check if clicking on tray item to return it
+                // Check if clicking on tray item to return it (only in tray area)
                 Item clickedTrayItem = m_slotTray.GetItemAtPosition(clickPos);
                 if (clickedTrayItem != null && clickedTrayItem.OriginalCell != null && clickedTrayItem.OriginalCell.IsEmpty)
                 {
                     m_slotTray.RemoveItem(clickedTrayItem);
                     clickedTrayItem.SetSortingLayerLower();
                     clickedTrayItem.OriginalCell.Assign(clickedTrayItem);
-                    clickedTrayItem.AnimationMoveToPosition(); // Moves back to cell
+                    clickedTrayItem.AnimationMoveToPosition();
                 }
             }
         }
