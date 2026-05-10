@@ -107,6 +107,11 @@ public class UIMainManager : MonoBehaviour
         return null;
     }
 
+    private UIPanelGame GetGamePanel()
+    {
+        return m_menuList.Where(x => x is UIPanelGame).Cast<UIPanelGame>().FirstOrDefault();
+    }
+
     internal void ShowPauseMenu()
     {
         m_gameManager.SetState(GameManager.eStateGame.PAUSE);
@@ -135,5 +140,7 @@ public class UIMainManager : MonoBehaviour
     internal void LoadLevelTimeChallenge()
     {
         m_gameManager.LoadLevelTimeChallenge();
+        // Show the timer panel only for Time Challenge
+        GetGamePanel()?.ShowConditionPanel(true);
     }
 }
